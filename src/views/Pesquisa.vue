@@ -28,7 +28,7 @@
             {{ post.date }}
           </b-col>
           <b-col cols="2">
-            {{ post.relevance === 0 ? "" : post.relevance  }}
+            {{ post.relevance === 0 ? "" : post.relevance }}
           </b-col>
         </b-row>
       </b-list-group-item>
@@ -39,14 +39,20 @@
       content-class="shadow"
       :title="`Detalhes de postagem id: ${postSelected.id}`"
     >
-      {{ postSelected.text }}
-
       <highlightable-input
         highlight-style="background-color:yellow"
         :highlight-enabled="true"
         :highlight="highlight"
         v-model="postSelected.text"
       />
+
+      <b-badge style="background-color:#4894f7">Nome Próprio</b-badge>
+      <b-badge style="background-color:">Organização</b-badge>
+      <b-badge style="background-color:">Local</b-badge>
+      <b-badge style="background-color:#fa7066">Verbo</b-badge>
+      <b-badge style="background-color:">Número</b-badge>
+      <b-badge style="background-color:">Data</b-badge>
+      <b-badge style="background-color:">Substantivo</b-badge>
     </b-modal>
   </b-container>
 </template>
@@ -66,14 +72,7 @@ export default {
       postSelected: {},
       postId: {},
       posts: [],
-      highlight: [
-        { text: "Presidente", style: "background-color:#f37373" },
-        { text: "enfrenta", style: "background-color:#fca88f" },
-        { text: "senhor", style: "background-color:#bbe4cb" },
-        { text: "compreendo", style: "background-color:#fff05e" },
-        "whatever",
-        { start: 2, end: 5, style: "background-color:#f330ff" }
-      ]
+      highlight: [],
     };
   },
   computed: {
@@ -83,8 +82,37 @@ export default {
   },
   methods: {
     openModal(post) {
+      this.getEntities(post.text);
       this.postSelected = post;
       this.$bvModal.show("post-info-modal");
+    },
+    async getEntities(message) {
+      const response = await Axios.get(`http://localhost:8080/PlnTCS/api/query?key=1335809234&text=${message}`);
+      const data = response.data;
+      this.makeHighlits(data.entitys);
+    },
+    makeHighlits(entities) {
+      entities.forEach(e => {
+        console.log(e);
+        if (e.type == "ACTION") {
+          this.highlight.push({text: e.description.trim() , style: "background-color:#fa7066" }) // vermelho
+        }
+        if (e.type == "NOUN") {
+          this.highlight.push({text: e.description.trim() , style: "background-color:#f7dfb2" }) // amarelo claro
+        }
+        if (e.type == "ORGANIZATION") {
+          this.highlight.push({text: e.description.trim() , style: "background-color:#8ef597" }) // verde
+        }
+        if (e.type == "PERSON") {
+          this.highlight.push({text: e.description.trim() , style: "background-color:#4894f7" }) // azul
+        }
+        if (e.type == "NUMBER") {
+          this.highlight.push({text: e.description.trim() , style: "background-color:#cce2ff" }) // azul claro
+        }
+
+      });
+
+
     },
     async doSearch() {
       console.log(this.message);
