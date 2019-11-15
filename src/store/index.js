@@ -5,7 +5,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    user: {}
+    user: {},
+    key: null,
   },
   mutations: {
     getUser() {
@@ -13,8 +14,8 @@ export default new Vuex.Store({
     },
     setUser(user) {
       this.user = user;
-    }
+    },
   },
   actions: {},
-  modules: {}
+  modules: {},
 });

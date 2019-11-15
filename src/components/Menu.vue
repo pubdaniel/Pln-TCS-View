@@ -7,8 +7,6 @@ export default {
   data() {
     return {
       menu: [
-        { icon: "fa fa-user" },
-
         {
           header: true,
           title: "Main Navigation",
@@ -19,6 +17,7 @@ export default {
           href: "/dashboard",
           title: "Administrativo",
           icon: "fa fa-cog",
+          
         },
         {
           href: "/pesquisa",
