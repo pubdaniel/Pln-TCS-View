@@ -8,6 +8,11 @@ export default {
     return {
       menu: [
         {
+          href: "/logout",
+          title: "logout",
+          icon: "fa fa-sign-out",
+        },
+        {
           header: true,
           title: "Main Navigation",
           hiddenOnCollapse: true,

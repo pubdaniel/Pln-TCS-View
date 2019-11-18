@@ -10,20 +10,25 @@ export default {
   data() {
     return {};
   },
-  async getEntities(message) {
-    const response = axios.get`query?key=1335809234&text=${message}`;
-    return response.data;
+  async getEntities(key, message) {
+    const response = await HTTP.get(`query?key=${key}&text=${message}`);
+    return response.data.entitys;
   },
   async getAuth(user, pass) {
-    const response = await axios({
-      method: "post",
-      url: "http://localhost:8080/PlnTCS/api/user/login",
-      data: qs.stringify({ username: user, password: pass }),
-      headers: {
-        "content-type": "application/x-www-form-urlencoded;charset=utf-8",
-      },
-    });
-    return response.data.key;
+    try {
+      const response = await axios({
+        method: "post",
+        url: "http://localhost:8080/PlnTCS/api/user/login",
+        data: qs.stringify({ username: user, password: pass }),
+        headers: {
+          "content-type": "application/x-www-form-urlencoded;charset=utf-8",
+        },
+      });
+      console.log(response)
+      return response;
+    }  catch (err) {
+      return err;
+    }
   },
   async getUser(key) {
     const response = await HTTP.get(`/user?key=${key}`);
@@ -34,6 +39,11 @@ export default {
   },
   async getPosts(key) {
     return await HTTP.get(`/posts?key=${key}`)
+  },
+  async getPostsWithFilter(key, message) {
+    const response = await HTTP.get(`posts?key=${key}&text=${message}`);
+    console.log(response.data)
+    return response.data
   }
   
 };

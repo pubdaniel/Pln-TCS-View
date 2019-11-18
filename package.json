@@ -15,6 +15,7 @@
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.4",
     "core-js": "^3.3.2",
+    "dateformat": "^3.0.3",
     "fibers": "^4.0.2",
     "font-awesome": "^4.7.0",
     "jquery": "^3.4.1",

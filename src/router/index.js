@@ -3,12 +3,17 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Login from "../views/Login.vue";
 import Pesqusia from "../views/Pesquisa.vue";
-import Resultado from "../views/Resultado.vue";
 import Administrativo from "../views/Administrativo.vue";
+import Logout from "../views/Logout.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
+  {
+    path: "/logout",
+    name: "Logout",
+    component:Logout,
+  },
   {
     path: "/",
     name: "Login",
@@ -18,11 +23,6 @@ const routes = [
     path: "/pesquisa",
     name: "Pesquisa",
     component: Pesqusia,
-  },
-  {
-    path: "/resultado",
-    name: "Resultado",
-    component: Resultado,
   },
   {
     path: "/dashboard",

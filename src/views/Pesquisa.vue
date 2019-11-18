@@ -1,19 +1,33 @@
 <template>
-  <b-container>
+  <b-container >
+      <b-row align-h="center">
+    <b-col cols="4" md="auto">
     <h1>Pesquisa</h1>
-
     <b-input-group>
       <b-form-input
         placeholder="Digite os termos de pesquisa"
         v-model="message"
       >
       </b-form-input>
-      <b-button variant="outline-success" @click="doSearch()">buscar</b-button>
+      <b-button variant="outline-success" @click="doSearch()">
+        <b-spinner type="grow" v-show="isLoading" small ></b-spinner>
+        buscar
+        </b-button>
+        <b-button variant="outline-warning" @click="doTeste()">
+        <b-spinner type="grow" v-show="isTesteLoading" small ></b-spinner>
+        Teste
+        </b-button>
     </b-input-group>
 
-    <p>{{ posts.length }} resultados encontrados</p>
+    <p>{{ rows }} resultados encontrados</p>
+    
+    <b-card v-show="isEntitiesTestNotEmpty">
+       <b-table striped hover :items="entitiesTest"></b-table>
+    </b-card>
 
-    <b-list-group>
+    <b-table striped hover :items="posts" :fields="fieldsPosts"></b-table>
+
+    <!-- <b-list-group v-show="showListPosts">
       <b-list-group-item
         v-for="post in posts"
         v-bind:key="post.id"
@@ -32,7 +46,10 @@
           </b-col>
         </b-row>
       </b-list-group-item>
-    </b-list-group>
+    </b-list-group> -->
+
+
+
     <b-modal
       id="post-info-modal"
       content-class="shadow"
@@ -43,16 +60,20 @@
         :highlight-enabled="true"
         :highlight="highlight"
         v-model="postSelected.text"
+        aria-disabled="true"
       />
 
       <b-badge style="background-color:#4894f7">Nome Próprio</b-badge>
-      <b-badge style="background-color:">Organização</b-badge>
-      <b-badge style="background-color:">Local</b-badge>
+      <b-badge style="background-color:#8ef597">Organização</b-badge>
+      <b-badge style="background-color:#FF66B2">Local</b-badge>
       <b-badge style="background-color:#fa7066">Verbo</b-badge>
-      <b-badge style="background-color:">Número</b-badge>
-      <b-badge style="background-color:">Data</b-badge>
-      <b-badge style="background-color:">Substantivo</b-badge>
+      <b-badge style="background-color:#cce2ff">Número</b-badge>
+      <b-badge style="background-color:#FFB266">Data</b-badge>
+      <b-badge style="background-color:#cccc00">Substantivo</b-badge>
     </b-modal>
+
+    </b-col>
+      </b-row>
   </b-container>
 </template>
 
@@ -66,8 +87,15 @@ export default {
   },
   data() {
     return {
+      fieldsPosts: [{"name" : "Nome"}, { "place" : "Local"} , { "text" : "Mansagem" } , {"date" : "Data"}, {"relevance": "Relevância"} ],
+
+      entitiesTest:[],
+      entities: [],
+      isTesteLoading: false,
+      showListPosts: false,
+      isLoading: false,
       key: null,
-      message: "Carlos peruca Rio 2019",
+      message: "",
       currentPage: 0,
       postSelected: {},
       postId: {},
@@ -77,19 +105,30 @@ export default {
   },
   computed: {
     rows() {
-      return this.posts.length;
+      return this.posts != undefined ? this.posts.length : 0 ;
     },
+    isEntitiesTestNotEmpty() {
+        return this.entitiesTest.length > 0;
+      }
   },
   methods: {
+    async doTeste() {
+      this.isTesteLoading = true;
+      const entities = await axios.getEntities(localStorage.getItem("key"), this.message);
+      this.entitiesTest = entities;
+      this.isTesteLoading = false;
+
+    },
     openModal(post) {
+      this.highlight = [];
       this.getEntities(post.text);
       this.postSelected = post;
       this.$bvModal.show("post-info-modal");
+      
     },
     async getEntities(message) {
-      const response = await axios.getEntities(message);
-      const data = response.data;
-      this.makeHighlits(data.entitys);
+      const entities = await axios.getEntities(localStorage.getItem("key"), message);
+      this.makeHighlits(entities);
     },
     makeHighlits(entities) {
       entities.forEach(e => {
@@ -103,7 +142,7 @@ export default {
         if (e.type == "NOUN") {
           this.highlight.push({
             text: e.description.trim(),
-            style: "background-color:#f7dfb2",
+            style: "background-color:#cccc00",
           }); // amarelo claro
         }
         if (e.type == "ORGANIZATION") {
@@ -124,15 +163,24 @@ export default {
             style: "background-color:#cce2ff",
           }); // azul claro
         }
+        if (e.type == "DATE") {
+          this.highlight.push({
+            text: e.description.trim(),
+            style: "background-color:#FFB266",
+          }); // 
+        }
+
       });
     },
     async doSearch() {
-      console.log(this.message);
-      const response = await axios.get(
-        `posts?key=1335809234&text=${this.message}`
-      );
-      console.log(response);
-      this.posts = response.data;
+      this.showListPosts = false;
+      this.isLoading = true; 
+      const response = await axios.getPostsWithFilter(localStorage.getItem("key"), this.message);
+      console.log(response)
+      this.posts = response;
+      this.isLoading = false;
+      this.showListPosts = true;
+      
     },
   },
   created() {
@@ -147,6 +195,7 @@ export default {
       console.log(response);
       this.posts = response.data;
       this.key = this.$store.state.key;
+      this.showListPosts = true;
     } else {
       console.log("redirecionamento");
       await this.$router.push("Login");
