@@ -25,30 +25,19 @@
        <b-table striped hover :items="entitiesTest"></b-table>
     </b-card>
 
-    <b-table striped hover :items="posts" :fields="fieldsPosts"></b-table>
+    <b-table striped hover :items="posts" :fields="fieldsPosts" responsive="sm">
+      <template v-slot:cell(date)="data">
+        {{ new Date(data.value).toLocaleString() }}
+      </template>
 
-    <!-- <b-list-group v-show="showListPosts">
-      <b-list-group-item
-        v-for="post in posts"
-        v-bind:key="post.id"
-        button
-        @click="openModal(post)"
-      >
-        <b-row>
-          <b-col cols="10">
-            @{{ post.username }} - {{ post.name }} - Followers:
-            {{ post.followers }} <br />
-            {{ post.text }} <br />
-            {{ post.date }}
-          </b-col>
-          <b-col cols="2">
-            {{ post.relevance === 0 ? "" : post.relevance }}
-          </b-col>
-        </b-row>
-      </b-list-group-item>
-    </b-list-group> -->
+      <template v-slot:cell(details)="row">
+        <b-button size="sm" @click="openModal(row.item)" class="mr-2">
+          Detalhes
+        </b-button>
+      </template>
+    </b-table>
 
-
+     
 
     <b-modal
       id="post-info-modal"
@@ -87,7 +76,7 @@ export default {
   },
   data() {
     return {
-      fieldsPosts: [{"name" : "Nome"}, { "place" : "Local"} , { "text" : "Mansagem" } , {"date" : "Data"}, {"relevance": "Relevância"} ],
+      fieldsPosts: [{"name" : "Nome"}, { "place" : "Local"} , { "text" : "Mansagem" } , {"date" : "Data"}, {"relevance": "Relevância"} , {"details": "Detalhes"}],
 
       entitiesTest:[],
       entities: [],
@@ -112,6 +101,10 @@ export default {
       }
   },
   methods: {
+    async showDetails(item) {
+      this.openModal(item);
+      console.log(item)
+    },
     async doTeste() {
       this.isTesteLoading = true;
       const entities = await axios.getEntities(localStorage.getItem("key"), this.message);

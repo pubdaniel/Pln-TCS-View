@@ -1,7 +1,7 @@
 <template>
   <b-container>
     
-      <b-card title="Login" style="max-width: 20rem;" class="mb-2">
+      <b-card title="Login" class="login d-flex justify-content-center">
         <b-card-text >
           <b-form-input
             
@@ -65,5 +65,9 @@ export default {
 </script>
 
 <style>
-
+.login {
+  margin-left: 10%;
+  margin-top: 60%;
+  
+}
 </style>
