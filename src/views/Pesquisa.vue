@@ -22,7 +22,7 @@
     <p>{{ rows }} resultados encontrados</p>
     
     <b-card v-show="isEntitiesTestNotEmpty">
-       <b-table striped hover :items="entitiesTest"></b-table>
+       <b-table striped hover :fields="fieldsTest" :items="entitiesTest"></b-table>
     </b-card>
 
     <b-table striped hover :items="posts" :fields="fieldsPosts" responsive="sm">
@@ -77,7 +77,7 @@ export default {
   data() {
     return {
       fieldsPosts: [{"name" : "Nome"}, { "place" : "Local"} , { "text" : "Mansagem" } , {"date" : "Data"}, {"relevance": "Relevância"} , {"details": "Detalhes"}],
-
+      fieldsTest: [{"description": "Descrição"} , {"type": "Tipo"}, {"probability": "Precisão"}],
       entitiesTest:[],
       entities: [],
       isTesteLoading: false,
